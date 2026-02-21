@@ -1,3 +1,51 @@
+# name: Deploy Backend
+
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+
+#       - name: Deploy via SSH
+#         uses: appleboy/ssh-action@v1.0.3
+#         with:
+#           host: ${{ secrets.SSH_HOST }}
+#           username: ${{ secrets.SSH_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           passphrase: ${{ secrets.SSH_PASSPHRASE }}
+#           port: 22
+#           script: |
+#             set -e
+
+#             # Aller dans le dossier du projet
+#             cd ~/mbj-backend
+
+#             # Récupérer les dernières modifications
+#             git pull origin main
+
+#             # Activer le virtualenv cPanel
+#             source ~/virtualenv/mbj-backend/3.13/bin/activate
+
+#             # Installer / mettre à jour les dépendances
+#             pip install -r requirements.txt --quiet
+
+#             # Appliquer les migrations
+#             alembic upgrade head
+
+#             # Redémarrer l'application via le fichier touch cPanel
+#             touch ~/mbj-backend/tmp/restart.txt
+
+#             echo "✅ Déploiement terminé avec succès"
+
+
+
+
 name: Deploy Backend
 
 on:
@@ -12,33 +60,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-          port: 2222
-          script: |
-            set -e
-
-            # Aller dans le dossier du projet
-            cd ~/mbj-backend
-
-            # Récupérer les dernières modifications
-            git pull origin main
-
-            # Activer le virtualenv cPanel
-            source ~/virtualenv/mbj-backend/3.13/bin/activate
-
-            # Installer / mettre à jour les dépendances
-            pip install -r requirements.txt --quiet
-
-            # Appliquer les migrations
-            alembic upgrade head
-
-            # Redémarrer l'application via le fichier touch cPanel
-            touch ~/mbj-backend/tmp/restart.txt
-
-            echo "✅ Déploiement terminé avec succès"
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /mbj-backend/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/__pycache__/**
+            **/*.pyc
+            **/venv/**
+            **/.env
+            **/uploads/**
