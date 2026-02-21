@@ -1,19 +1,18 @@
-# alembic/env.py
-
-# Charger le .env AVANT tout import des modules du projet
 import os
 from dotenv import load_dotenv
+
+# Charger .env en tout premier absolu
 load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
+
+# Lire DATABASE_URL directement depuis os.environ
+DATABASE_URL = os.environ["DATABASE_URL"]
 
 import asyncio
 from logging.config import fileConfig
 from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 
-from core.config import settings
 from core.database import Base
-
-# Import des modèles pour qu'Alembic les détecte
 import models.user        # noqa
 import models.category    # noqa
 import models.article     # noqa
@@ -29,7 +28,7 @@ target_metadata = Base.metadata
 
 def run_migrations_offline():
     context.configure(
-        url=settings.DATABASE_URL,
+        url=DATABASE_URL,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -39,7 +38,7 @@ def run_migrations_offline():
 
 
 async def run_migrations_online():
-    engine = create_async_engine(settings.DATABASE_URL)
+    engine = create_async_engine(DATABASE_URL)
     async with engine.connect() as connection:
         await connection.run_sync(
             lambda conn: context.configure(
