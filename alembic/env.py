@@ -1,5 +1,10 @@
 # alembic/env.py
 
+# Charger le .env AVANT tout import des modules du projet
+import os
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
+
 import asyncio
 from logging.config import fileConfig
 from sqlalchemy.ext.asyncio import create_async_engine
@@ -45,7 +50,7 @@ async def run_migrations_online():
         )
         async with connection.begin():
             await connection.run_sync(lambda _: context.run_migrations())
-    await engine.dispose()
+    engine.sync_engine.dispose()
 
 
 if context.is_offline_mode():
