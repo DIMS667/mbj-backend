@@ -41,7 +41,7 @@
 #             # Redémarrer l'application via le fichier touch cPanel
 #             touch ~/mbj-backend/tmp/restart.txt
 
-#             echo "✅ Déploiement terminé avec succès"
+#             echo "✅ Déploiement terminé avec "
 
 
 
