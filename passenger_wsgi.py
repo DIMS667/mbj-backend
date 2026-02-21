@@ -1,21 +1,21 @@
-# passenger_wsgi.py — Point d'entrée cPanel Passenger pour FastAPI
-
 import sys
 import os
+import traceback
 
-# Ajouter le dossier du projet au path Python
 sys.path.insert(0, os.path.dirname(__file__))
 
-# Charger les variables d'environnement depuis .env si présent
 try:
     from dotenv import load_dotenv
     load_dotenv(os.path.join(os.path.dirname(__file__), '.env'))
-except ImportError:
-    pass
+    from main import app
+    from a2wsgi import ASGIMiddleware
+    application = ASGIMiddleware(app)
+except Exception as e:
+    error_msg = traceback.format_exc()
+    def application(environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/plain')])
+        return [f"ERREUR:\n{error_msg}".encode()]
 
-# Importer l'app FastAPI
-from main import app
-
-# Adaptateur ASGI → WSGI pour Passenger
-from a2wsgi import ASGIMiddleware
-application = ASGIMiddleware(app)
+# source ~/virtualenv/mbj-backend/3.13/bin/activate
+# cd ~/mbj-backend
+# alembic upgrade head
